@@ -23,15 +23,17 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', 
     'rest_framework',
+    'corsheaders',
     'rest_framework_simplejwt',
     'drf_yasg',
     'products',
-    'authentication',
+    'authentication',  
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [ 
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -126,3 +128,10 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://claude.ai",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
