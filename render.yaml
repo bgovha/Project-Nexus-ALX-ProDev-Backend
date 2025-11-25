@@ -4,7 +4,8 @@ services:
     env: python
     plan: free
     buildCommand: bash build.sh
-    startCommand: gunicorn ecommerce.wsgi:application
+    # Bind to the port Render provides via the $PORT env var
+    startCommand: gunicorn ecommerce.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DEBUG
         value: false
