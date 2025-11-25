@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'products',
-    'authentication',  
+    'authentication',
+    
 ]
 
 MIDDLEWARE = [ 

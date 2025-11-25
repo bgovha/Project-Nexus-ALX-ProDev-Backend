@@ -68,3 +68,31 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+## Frontend
+
+A simple React-based dashboard to interact with the API.
+
+### Running the Frontend
+
+#### Option 1: HTML File (Simple)
+1. Open `frontend/index.html` in your browser
+2. Make sure Django backend is running at `http://127.0.0.1:8000`
+
+#### Option 2: React App (Professional)
+1. Navigate to frontend directory:
+```bash
+cd frontend
+npm install
+npm start
+```
+2. Frontend will run at `http://localhost:3000`
+3. Make sure Django backend is running at `http://127.0.0.1:8000`
+
+### Features
+- Browse products with search, filter, and sort
+- User authentication (register/login)
+- CRUD operations for products (authenticated users only)
+- Responsive design
+- Real-time updates
