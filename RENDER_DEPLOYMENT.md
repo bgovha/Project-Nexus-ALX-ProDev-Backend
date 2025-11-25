@@ -107,6 +107,18 @@ curl https://nexus-backend.onrender.com/api/products/
 curl https://nexus-backend.onrender.com/api/auth/register/
 ```
 
+### Health check endpoint
+
+The app provides a simple health check at `/health/` which returns JSON {"status": "ok"}. Use this to verify the application is up:
+
+```bash
+curl https://nexus-backend.onrender.com/health/
+```
+
+### CI
+
+This repository includes a GitHub Actions workflow `.github/workflows/ci.yml` which installs requirements, runs migrations, and runs unit tests. Ensure your tests pass in CI before final submission.
+
 ## Common Issues & Fixes
 
 ### Issue: "502 Bad Gateway" or "Internal Server Error"

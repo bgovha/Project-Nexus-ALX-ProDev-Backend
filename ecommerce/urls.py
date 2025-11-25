@@ -4,6 +4,7 @@ from django.views.generic.base import RedirectView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.http import JsonResponse
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -20,6 +21,7 @@ schema_view = get_schema_view(
 # Temporarily reduce URL patterns to isolate a recursion error during system checks.
 # Reintroduce API and docs routes incrementally to find the culprit if needed.
 urlpatterns = [
+    path('health/', lambda request: JsonResponse({'status': 'ok'})),
     path('', RedirectView.as_view(pattern_name='schema-swagger-ui', permanent=False)),
     path('admin/', admin.site.urls),
     path('api/', include('products.urls')),

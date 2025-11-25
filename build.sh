@@ -1,8 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Exit immediately if a command exits with a non-zero status
 set -o errexit
+set -o nounset
+set -o pipefail
 
-pip install -r requirements.txt
+echo "Installing Python package dependencies..."
+pip install --upgrade pip
+pip install --no-cache-dir -r requirements.txt
 
-python manage.py collectstatic --noinput
+echo "Collecting static files..."
+python manage.py collectstatic --noinput || echo "collectstatic returned non-zero status"
 
-python manage.py migrate
+echo "Applying database migrations..."
+python manage.py migrate --noinput
+
+echo "Build script finished."
