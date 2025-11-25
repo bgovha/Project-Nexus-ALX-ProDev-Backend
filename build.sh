@@ -14,4 +14,12 @@ python manage.py collectstatic --noinput || echo "collectstatic returned non-zer
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 
+echo "Creating superuser if DJANGO_SUPERUSER_* env vars are present..."
+if [ -n "${DJANGO_SUPERUSER_USERNAME:-}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+	# create_admin management command is idempotent and will skip if user exists
+	python manage.py create_admin || echo "create_admin failed (check logs)"
+else
+	echo "No DJANGO_SUPERUSER_* env vars found — skipping superuser creation"
+fi
+
 echo "Build script finished."

@@ -64,6 +64,8 @@ python manage.py migrate
 
 ```bash
 python manage.py createsuperuser
+
+Note: For automated deployments you can create a non-interactive superuser by setting environment variables — `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_PASSWORD` (optionally `DJANGO_SUPERUSER_EMAIL`). The project's `build.sh` will call `manage.py create_admin` when both username and password are present; the command is idempotent and won't duplicate an existing admin.
 ```
 
 7. Run server:
@@ -107,7 +109,6 @@ Visit `/swagger/` or `/redoc/` for interactive API documentation.
 
 ![ERD Diagram](https://docs.google.com/document/d/1DkNpSgBJPxQ4W6xHPDwg99dHGPPP1nQhYQIpfNz0t4A/edit?usp=sharing)
 
-
 ## Frontend
 
 A simple React-based dashboard to interact with the API.
@@ -115,20 +116,25 @@ A simple React-based dashboard to interact with the API.
 ### Running the Frontend
 
 #### Option 1: HTML File (Simple)
+
 1. Open `frontend/index.html` in your browser
 2. Make sure Django backend is running at `http://127.0.0.1:8000`
 
 #### Option 2: React App (Professional)
+
 1. Navigate to frontend directory:
+
 ```bash
 cd frontend
 npm install
 npm start
 ```
+
 2. Frontend will run at `http://localhost:3000`
 3. Make sure Django backend is running at `http://127.0.0.1:8000`
 
 ### Features
+
 - Browse products with search, filter, and sort
 - User authentication (register/login)
 - CRUD operations for products (authenticated users only)
@@ -155,3 +161,35 @@ Make sure each of the links above is accessible to mentors (view permission enab
 
 - `/health/` — basic health check that returns a simple JSON payload to confirm the app is running.
 - CI — there is a GitHub Actions workflow in `.github/workflows/ci.yml` which runs tests on push/PR.
+
+## Deploying to Railway
+
+If you're deploying to Railway, follow these exact settings to avoid the `chmod` wrapper issue and make sure the build script runs correctly:
+
+1. In your Railway project, open your Service and go to **Settings → Build & Deploy**
+
+2. Set the **Build Command** to exactly:
+
+```
+build.sh
+```
+
+Important: do NOT use `bash build.sh` as the Build Command — Railway prepends a `chmod +x` to the build command and `chmod +x bash build.sh` treats `bash` as a filename and fails. Using `build.sh` (or `./build.sh`) means Railway will correctly run `chmod +x build.sh && sh build.sh`.
+
+3. Set the **Start Command** to either the value in the `Procfile` (automatically used by Railway) or:
+
+```
+gunicorn ecommerce.wsgi:application --bind 0.0.0.0:$PORT
+```
+
+4. Ensure environment variables are set (SECRET_KEY, DATABASE_URL, ALLOWED_HOSTS, DEBUG=false).
+
+Optional: To automatically create a superuser during deployment, set these environment variables on your host:
+
+- DJANGO_SUPERUSER_USERNAME
+- DJANGO_SUPERUSER_PASSWORD
+- (Optional) DJANGO_SUPERUSER_EMAIL
+
+5. Trigger a deployment and inspect logs. The build step should install packages and then run `build.sh` without the `chmod` error.
+
+If anything still fails, paste the new Railway build logs here and I’ll help triage further.
