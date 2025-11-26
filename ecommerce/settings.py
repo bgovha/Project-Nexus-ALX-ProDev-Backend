@@ -129,10 +129,12 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+# When running locally with a frontend dev server, these origins are allowed.
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://claude.ai",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# For safety, explicitly set whether to allow all origins. In production
+# prefer setting this to False and whitelisting only the required origins.
+CORS_ALLOW_ALL_ORIGINS = False

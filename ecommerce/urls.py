@@ -18,8 +18,16 @@ schema_view = get_schema_view(
 )
 
 
-# Temporarily reduce URL patterns to isolate a recursion error during system checks.
-# Reintroduce API and docs routes incrementally to find the culprit if needed.
+"""Main URL configuration for the project.
+
+Routes:
+- /health/ - simple health check
+- / - redirect to Swagger UI
+- /admin/ - Django admin
+- /api/ - product API
+- /api/auth/ - authentication endpoints
+- /swagger/ and /redoc/ - API docs
+"""
 urlpatterns = [
     path('health/', lambda request: JsonResponse({'status': 'ok'})),
     path('', RedirectView.as_view(pattern_name='schema-swagger-ui', permanent=False)),
