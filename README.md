@@ -162,6 +162,18 @@ Make sure each of the links above is accessible to mentors (view permission enab
 - `/health/` — basic health check that returns a simple JSON payload to confirm the app is running.
 - CI — there is a GitHub Actions workflow in `.github/workflows/ci.yml` which runs tests on push/PR.
 
+## Troubleshooting /swagger/ 500 errors
+
+If you see an Internal Server Error (500) when opening `/swagger/` in a production-like environment (DEBUG=False), it is commonly caused by the staticfiles manifest missing required assets (e.g. drf-yasg's swagger-ui files). The manifest-backed storage will raise a ValueError if a template references a static path that isn't present in the manifest.
+
+Quick fixes:
+
+- Run collectstatic during your build/deploy (this project runs `python manage.py collectstatic --noinput` in `build.sh`) so the manifest includes `drf-yasg` assets.
+- Make sure `STATIC_ROOT` is set and writable by your deployment process.
+- For local development, enable DEBUG=True so the default staticfiles storage is used (or use the local server's static serving) — the settings already use the default storage in DEBUG to avoid this crash.
+
+If the problem persists after `collectstatic`, paste the deployment logs here and I can help locate which static asset is missing.
+
 ## Deploying to Railway
 
 If you're deploying to Railway, follow these exact settings to avoid the `chmod` wrapper issue and make sure the build script runs correctly:
