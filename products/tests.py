@@ -37,3 +37,26 @@ class ProductAPITests(APITestCase):
 		# With Token auth the test client regular login may not create JWT — so accept 201 or 401
 		# We'll check that endpoint does not error with 500
 		self.assertNotEqual(resp2.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+	def test_filter_by_category(self):
+		# Create second product with a different category
+		cat2 = Category.objects.create(name='Books', description='Reading')
+		Product.objects.create(name='Book', description='A book', price='9.99', stock_quantity=5, category=cat2, created_by=self.user)
+		url = reverse('product-list')
+		resp = self.client.get(url + f'?category={self.cat.id}')
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		# Ensure only products in the Electronics category are returned
+		items = resp.data.get('results', resp.data) if isinstance(resp.data, dict) else resp.data
+		for item in items:
+			self.assertEqual(item['category'], self.cat.id)
+
+	def test_ordering_by_price(self):
+		# Add multiple products and ensure ordering works
+		Product.objects.create(name='Cheap', description='Cheap item', price='5.00', stock_quantity=2, category=self.cat, created_by=self.user)
+		Product.objects.create(name='Expensive', description='Expensive item', price='1000.00', stock_quantity=1, category=self.cat, created_by=self.user)
+		url = reverse('product-list')
+		resp = self.client.get(url + '?ordering=price')
+		self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		items = resp.data.get('results', resp.data) if isinstance(resp.data, dict) else resp.data
+		prices = [float(item['price']) for item in items]
+		self.assertEqual(prices, sorted(prices))

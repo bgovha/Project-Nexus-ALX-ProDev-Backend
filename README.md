@@ -205,3 +205,20 @@ Optional: To automatically create a superuser during deployment, set these envir
 5. Trigger a deployment and inspect logs. The build step should install packages and then run `build.sh` without the `chmod` error.
 
 If anything still fails, paste the new Railway build logs here and I’ll help triage further.
+
+## Security note — remove secrets from the repo
+
+I found a `.env` file with credentials committed in this repository and removed it from the Git index.
+If your repository previously contained sensitive values (SECRET_KEY, DB passwords), you should rotate those credentials immediately and follow these steps:
+
+1. Rotate any passwords and SECRET_KEY values that were exposed.
+2. Make sure `.env` is listed in `.gitignore` (done) and _do not_ commit secrets into the repo.
+3. Use the host/CI secret store (Railway/Render/GitHub Secrets) to set production credentials.
+
+If you want, I can help generate a new SECRET_KEY and walk you through rotating the database password and secrets on your platform.
+
+## Local testing and SQLite fallback
+
+To make local testing and CI robust even when you don't have a PostgreSQL server running locally, the project falls back to a SQLite database when no DATABASE_URL is provided. That means you can run tests and develop locally without creating a .env file or installing PostgreSQL.
+
+When deploying to production, continue using PostgreSQL (set DATABASE*URL or DB*\* environment variables) — the fallback is only for convenience in dev/test.

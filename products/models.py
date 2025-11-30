@@ -32,6 +32,7 @@ class Product(models.Model):
         indexes = [
             models.Index(fields=['price']),  # For sorting by price
             models.Index(fields=['category']),  # For filtering by category
+            models.Index(fields=['name']),  # For searching by name
         ]
 
     def __str__(self):

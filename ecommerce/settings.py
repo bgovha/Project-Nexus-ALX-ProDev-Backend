@@ -70,14 +70,21 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config(
-            'DATABASE_URL',
-            default=f"postgresql://{config('DB_USER', default='')}:{config('DB_PASSWORD', default='')}@{config('DB_HOST', default='')}:{config('DB_PORT', default='5432')}/{config('DB_NAME', default='')}"
-        )
-    )
-}
+# Database configuration
+# If DATABASE_URL is provided via environment/config, use dj-database-url
+# Otherwise fall back to a local SQLite DB (convenient for tests and local dev).
+database_url = config('DATABASE_URL', default=None)
+if database_url:
+    DATABASES = {
+        'default': dj_database_url.config(default=database_url)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
