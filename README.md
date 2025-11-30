@@ -62,14 +62,14 @@ python manage.py migrate
 
 6. Create superuser:
 
-```bash
+````bash
 python manage.py createsuperuser
 
 7. Run server:
 
 ```bash
 python manage.py runserver
-```
+````
 
 ## API Endpoints
 
@@ -101,6 +101,15 @@ python manage.py runserver
 ## Documentation
 
 Visit `/swagger/` or `/redoc/` for interactive API documentation.
+
+## Swagger session-auth and /accounts/login/ 404
+
+If you previously saw requests to `/accounts/login/?next=/swagger/` returning 404 (or the server raised a TemplateDoesNotExist for `registration/login.html`), that happened because the Swagger UI attempted to use Django session authentication. This project uses JWT; to avoid the session flow and the need for a `registration/login.html` template, the app disables session auth for Swagger (see `SWAGGER_SETTINGS.USE_SESSION_AUTH = False`).
+
+If you prefer session login (for testing the browsable UI), you can either:
+
+- Provide a simple template at `templates/registration/login.html`, OR
+- Remove `USE_SESSION_AUTH = False` from settings so the Swagger UI shows session login links again.
 
 ## Database Schema
 

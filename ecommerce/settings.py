@@ -143,6 +143,21 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+
+# drf-yasg / Swagger settings
+# Disable Django session authentication in the Swagger UI because this
+# project uses JWT. When enabled, the UI will attempt to link to
+# /accounts/login/ which requires a registration/login.html template.
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
 # When running locally with a frontend dev server, these origins are allowed.
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

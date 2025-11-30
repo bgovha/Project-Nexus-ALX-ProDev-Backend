@@ -34,6 +34,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('products.urls')),
     path('api/auth/', include('authentication.urls')),
+    # provide session auth views (login/logout/password management) so the
+    # Swagger UI's "Login" / session authentication redirect (to
+    # /accounts/login/?next=/swagger/) resolves instead of returning 404.
+    path('accounts/', include('django.contrib.auth.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
