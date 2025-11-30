@@ -111,6 +111,52 @@ If you prefer session login (for testing the browsable UI), you can either:
 - Provide a simple template at `templates/registration/login.html`, OR
 - Remove `USE_SESSION_AUTH = False` from settings so the Swagger UI shows session login links again.
 
+## Login & adding products (quick guide)
+
+There are two convenient ways to manage users and products: the Django Admin UI or the API (JWT). Pick whichever matches your workflow.
+
+1. Using Django Admin (recommended for manual management)
+
+- Create a superuser on your server (PythonAnywhere console / SSH) if you don't have one:
+
+```bash
+python manage.py createsuperuser
+```
+
+- Open `/admin/` in a browser, sign in with your superuser, and use the admin forms to add Categories and Products quickly. Products require selecting an existing Category.
+
+2. Using the API (programmatic / useful for integrations)
+
+- Register a user (if needed):
+
+  POST /api/auth/register/ { "username": "alice", "email": "alice@example.com", "password": "StrongPass123!", "password2": "StrongPass123!" }
+
+- Obtain JWT tokens:
+
+  POST /api/auth/login/ { "username": "alice", "password": "StrongPass123!" }
+
+  You'll receive an access token. Use it for subsequent calls in the Authorization header:
+
+  Authorization: Bearer <access_token>
+
+- Create a Category (if none exists):
+
+  POST /api/categories/ { "name": "Toys", "description": "Playthings" } (Requires auth)
+
+- Create a Product:
+
+  POST /api/products/ {
+  "name": "Toy Car",
+  "description": "A small toy car.",
+  "price": "9.99",
+  "stock_quantity": 20,
+  "category": <category_id>
+  }
+
+  The `created_by` field is handled automatically by the API when you POST as an authenticated user.
+
+Using Swagger: Open `/swagger/`, click the Authorize button and enter `Bearer <access_token>` to make authenticated API calls inside the UI.
+
 ## Database Schema
 
 ![ERD Diagram](https://docs.google.com/document/d/1DkNpSgBJPxQ4W6xHPDwg99dHGPPP1nQhYQIpfNz0t4A/edit?usp=sharing)
@@ -159,4 +205,20 @@ This repository is intended as a Project Nexus submission. Below are the require
 
 4. Demo video (YouTube / Google Drive): ADD DEMO VIDEO LINK HERE
 
-5. Hosted API (Render/Railway/etc): ADD HOSTED API URL HERE
+5. Hosted API (PythonAnywhere): ADD HOSTED API URL HERE
+
+## PythonAnywhere tips
+
+If you've deployed this project to PythonAnywhere, here are quick steps to confirm and manage the app:
+
+- Set the WSGI entry point to `ecommerce.wsgi:application` in the Web tab.
+- Install required packages in your web app's virtualenv: `pip install -r requirements.txt`.
+- Configure environment variables (SECRET_KEY, DATABASE_URL or leave blank to use SQLite, ALLOWED_HOSTS) via the PythonAnywhere Web UI.
+- Run migrations and collectstatic in a bash console:
+
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput
+```
+
+After that the Swagger docs at `/swagger/` should load and the admin site will be available at `/admin/` for user/product management.
