@@ -65,9 +65,6 @@ python manage.py migrate
 ```bash
 python manage.py createsuperuser
 
-Note: For automated deployments you can create a non-interactive superuser by setting environment variables — `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_PASSWORD` (optionally `DJANGO_SUPERUSER_EMAIL`). The project's `build.sh` will call `manage.py create_admin` when both username and password are present; the command is idempotent and won't duplicate an existing admin.
-```
-
 7. Run server:
 
 ```bash
@@ -154,71 +151,3 @@ This repository is intended as a Project Nexus submission. Below are the require
 4. Demo video (YouTube / Google Drive): ADD DEMO VIDEO LINK HERE
 
 5. Hosted API (Render/Railway/etc): ADD HOSTED API URL HERE
-
-Make sure each of the links above is accessible to mentors (view permission enabled) before submission. See `RENDER_DEPLOYMENT.md` for deployment instructions.
-
-## Additional endpoints and checks
-
-- `/health/` — basic health check that returns a simple JSON payload to confirm the app is running.
-- CI — there is a GitHub Actions workflow in `.github/workflows/ci.yml` which runs tests on push/PR.
-
-## Troubleshooting /swagger/ 500 errors
-
-If you see an Internal Server Error (500) when opening `/swagger/` in a production-like environment (DEBUG=False), it is commonly caused by the staticfiles manifest missing required assets (e.g. drf-yasg's swagger-ui files). The manifest-backed storage will raise a ValueError if a template references a static path that isn't present in the manifest.
-
-Quick fixes:
-
-- Run collectstatic during your build/deploy (this project runs `python manage.py collectstatic --noinput` in `build.sh`) so the manifest includes `drf-yasg` assets.
-- Make sure `STATIC_ROOT` is set and writable by your deployment process.
-- For local development, enable DEBUG=True so the default staticfiles storage is used (or use the local server's static serving) — the settings already use the default storage in DEBUG to avoid this crash.
-
-If the problem persists after `collectstatic`, paste the deployment logs here and I can help locate which static asset is missing.
-
-## Deploying to Railway
-
-If you're deploying to Railway, follow these exact settings to avoid the `chmod` wrapper issue and make sure the build script runs correctly:
-
-1. In your Railway project, open your Service and go to **Settings → Build & Deploy**
-
-2. Set the **Build Command** to exactly:
-
-```
-build.sh
-```
-
-Important: do NOT use `bash build.sh` as the Build Command — Railway prepends a `chmod +x` to the build command and `chmod +x bash build.sh` treats `bash` as a filename and fails. Using `build.sh` (or `./build.sh`) means Railway will correctly run `chmod +x build.sh && sh build.sh`.
-
-3. Set the **Start Command** to either the value in the `Procfile` (automatically used by Railway) or:
-
-```
-gunicorn ecommerce.wsgi:application --bind 0.0.0.0:$PORT
-```
-
-4. Ensure environment variables are set (SECRET_KEY, DATABASE_URL, ALLOWED_HOSTS, DEBUG=false).
-
-Optional: To automatically create a superuser during deployment, set these environment variables on your host:
-
-- DJANGO_SUPERUSER_USERNAME
-- DJANGO_SUPERUSER_PASSWORD
-- (Optional) DJANGO_SUPERUSER_EMAIL
-
-5. Trigger a deployment and inspect logs. The build step should install packages and then run `build.sh` without the `chmod` error.
-
-If anything still fails, paste the new Railway build logs here and I’ll help triage further.
-
-## Security note — remove secrets from the repo
-
-I found a `.env` file with credentials committed in this repository and removed it from the Git index.
-If your repository previously contained sensitive values (SECRET_KEY, DB passwords), you should rotate those credentials immediately and follow these steps:
-
-1. Rotate any passwords and SECRET_KEY values that were exposed.
-2. Make sure `.env` is listed in `.gitignore` (done) and _do not_ commit secrets into the repo.
-3. Use the host/CI secret store (Railway/Render/GitHub Secrets) to set production credentials.
-
-If you want, I can help generate a new SECRET_KEY and walk you through rotating the database password and secrets on your platform.
-
-## Local testing and SQLite fallback
-
-To make local testing and CI robust even when you don't have a PostgreSQL server running locally, the project falls back to a SQLite database when no DATABASE_URL is provided. That means you can run tests and develop locally without creating a .env file or installing PostgreSQL.
-
-When deploying to production, continue using PostgreSQL (set DATABASE*URL or DB*\* environment variables) — the fallback is only for convenience in dev/test.
