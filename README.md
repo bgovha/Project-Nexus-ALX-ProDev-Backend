@@ -205,7 +205,7 @@ This repository is intended as a Project Nexus submission. Below are the require
 
 4. Demo video (YouTube / Google Drive): ADD DEMO VIDEO LINK HERE
 
-5. Hosted API (PythonAnywhere): ADD HOSTED API URL HERE
+5. Hosted API (PythonAnywhere): https://bibigovha.pythonanywhere.com/
 
 ## PythonAnywhere tips
 
